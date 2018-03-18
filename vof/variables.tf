@@ -193,3 +193,4 @@ variable "min_redis_instances" {
 
 # redis server
 
+variable "bugsnag_key" {}

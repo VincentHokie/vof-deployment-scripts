@@ -14,6 +14,7 @@ export PORT="${PORT:-8080}"
 export SSL_CONFIG_PATH="ssl://0.0.0.0:8080?key=/home/vof/andela_key.key&cert=/home/vof/andela_certificate.crt"
 export RAILS_ENV="$(get_var "railsEnv")"
 export REDIS_IP=$(get_var "redisIp")
+export BUGSNAG_KEY="$(get_var "bugsnagKey")"
 export DEPLOY_ENV="$(get_var "railsEnv")"
 if [[ "$(get_var "railsEnv")" == "design-v2" ]]; then
  export DEPLOY_ENV="staging"
@@ -29,6 +30,7 @@ update_application_yml() {
   cat <<EOF >> /home/vof/app/config/application.yml
 ACTION_CABLE_URL: '$(get_var "cableURL")'
 REDIS_URL: 'redis://${REDIS_IP}'
+BUGSNAG_KEY: '$(get_var "bugsnagKey")'
 API_URL: 'https://api-staging.andela.com/'
 LOGIN_URL: 'https://api-staging.andela.com/login?redirect_url='
 LOGOUT_URL: 'https://api-staging.andela.com/logout?redirect_url='
@@ -83,6 +85,10 @@ get_database_dump_file() {
       echo "Database dump file created succesfully"
     fi
   fi
+}
+start_bugsnag(){
+ local app_root="/home/vof/app"
+sudo -u vof bash -c " cd ${app_root} && rails generate bugsnag ${BUGSNAG_KEY} -f"
 }
 
 start_app() {
@@ -254,7 +260,7 @@ main() {
 
   authenticate_service_account
   get_database_dump_file
-
+  start_bugsnag
   start_app
   configure_google_fluentd_logging
   configure_log_reader_positioning
