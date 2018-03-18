@@ -52,6 +52,11 @@ resource "google_compute_url_map" "vof-http-url-map" {
     default_service = "${google_compute_backend_service.web.self_link}"
 
     path_rule {
+      paths   = ["/cable"]
+      service = "${google_compute_backend_service.redis-front.self_link}"
+    }
+
+    path_rule {
       paths   = ["/*"]
       service = "${google_compute_backend_service.web.self_link}"
     }
