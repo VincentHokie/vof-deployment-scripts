@@ -36,7 +36,25 @@ resource "google_compute_target_https_proxy" "vof-https-proxy" {
   url_map = "${google_compute_url_map.vof-http-url-map.self_link}"
   ssl_certificates = ["${google_compute_ssl_certificate.vof-ssl-certificate.self_link}"]
 }
+
 # End HTTPS
+
+# Begin Redis TCP
+
+resource "google_compute_global_forwarding_rule" "redis-lb-fwd" {
+  name       = "redis-lb-fwd"
+  port_range = "1883"
+
+  ip_address = "${var.reserved_env_ip}"
+  target     = "${google_compute_target_tcp_proxy.vof-redis-tcp-proxy.self_link}"
+}
+
+resource "google_compute_target_tcp_proxy" "vof-redis-tcp-proxy" {
+  name            = "vof-redis-tcp-proxy"
+  backend_service = "${google_compute_backend_service.redis-front.self_link}"
+}
+
+# End Redis TCP
 
 resource "google_compute_url_map" "vof-http-url-map" {
   name            = "${var.env_name}-vof-url-map"
@@ -50,11 +68,6 @@ resource "google_compute_url_map" "vof-http-url-map" {
   path_matcher {
     name            = "allpaths"
     default_service = "${google_compute_backend_service.web.self_link}"
-
-    path_rule {
-      paths   = ["/cable"]
-      service = "${google_compute_backend_service.redis-front.self_link}"
-    }
 
     path_rule {
       paths   = ["/*"]
@@ -96,6 +109,19 @@ resource "google_compute_firewall" "vof-public-firewall" {
 
   source_ranges = ["0.0.0.0/0"]
   target_tags = ["${var.env_name}-vof-lb"]
+}
+
+resource "google_compute_firewall" "vof-public-firewall-redis" {
+  name    = "vof-redis-public-firewall"
+  network = "${google_compute_network.vof-network.name}"
+
+  allow {
+    protocol = "tcp"
+    ports    = ["6379"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+  target_tags   = ["redis-server"]
 }
 
 resource "google_compute_firewall" "vof-allow-healthcheck-firewall" {

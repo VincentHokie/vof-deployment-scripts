@@ -35,6 +35,8 @@ install_redis(){
 setup_webdis(){
   if which redis-cli; then
     sudo apt-get install make build-essential libevent-dev webdis -y # install webdis
+    sudo sed -i -e "s|\"http_host\":\s\"127.0.0.1\"|\"http_host\": \"0.0.0.0\"|" /etc/webdis/webdis.json 
+    sudo /etc/init.d/webdis restart
   fi
 }
 

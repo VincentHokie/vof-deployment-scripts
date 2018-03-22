@@ -1,18 +1,18 @@
 resource "google_compute_backend_service" "redis-front" {
   name        = "vof-redis-server-lb"
   description = "VOF Redis server Load Balancer"
-  port_name   = "customhttps"
-  protocol    = "HTTPS"
+  port_name   = "redis"
+  protocol    = "TCP"
   enable_cdn  = false
 
   backend {
     group = "${google_compute_instance_group_manager.vof-redis-server-group-manager.instance_group}"
   }
 
-  session_affinity = "GENERATED_COOKIE"
+  session_affinity = "None"
 
   timeout_sec   = 0
-  health_checks = ["${google_compute_https_health_check.vof-redis-server-healthcheck.self_link}"]
+  health_checks = ["${google_compute_health_check.vof-redis-server-healthcheck.self_link}"]
 }
 
 resource "google_compute_instance_group_manager" "vof-redis-server-group-manager" {
@@ -23,8 +23,8 @@ resource "google_compute_instance_group_manager" "vof-redis-server-group-manager
   update_strategy    = "NONE"
 
   named_port {
-    name = "customhttps"
-    port = 7379
+    name = "redis"
+    port = 6379
   }
 }
 
@@ -79,14 +79,17 @@ resource "google_compute_autoscaler" "vof-redis-server-autoscaler" {
   }
 }
 
-resource "google_compute_https_health_check" "vof-redis-server-healthcheck" {
+resource "google_compute_health_check" "vof-redis-server-healthcheck" {
   name                = "vof-redis-server-healthcheck"
-  port                = 7379
-  request_path        = "${var.redis_request_path}"
   check_interval_sec  = "${var.check_interval_sec}"
   timeout_sec         = "${var.timeout_sec}"
   unhealthy_threshold = "${var.unhealthy_threshold}"
   healthy_threshold   = "${var.healthy_threshold}"
+
+  http_health_check {
+    port         = "7379"
+    request_path = "${var.redis_request_path}"
+  }
 }
 
 resource "google_compute_firewall" "vof-redis-traffic-firewall" {
@@ -95,14 +98,9 @@ resource "google_compute_firewall" "vof-redis-traffic-firewall" {
 
   allow {
     protocol = "tcp"
-    ports    = ["6379"]
-  }
-
-  allow {
-    protocol = "tcp"
     ports    = ["7379"]
   }
 
-  source_ranges = ["0.0.0.0/0"]
+  source_ranges = ["130.211.0.0/22", "35.191.0.0/16"]
   target_tags   = ["redis-server"]
 }

@@ -29,7 +29,7 @@ gsutil cp gs://${BUCKET_NAME}/ssl/andela_certificate.crt /home/vof/andela_certif
 update_application_yml() {
   cat <<EOF >> /home/vof/app/config/application.yml
 ACTION_CABLE_URL: '$(get_var "cableURL")'
-REDIS_URL: 'redis://${REDIS_IP}'
+REDIS_URL: 'http://${REDIS_IP}:1883'
 BUGSNAG_KEY: '$(get_var "bugsnagKey")'
 API_URL: 'https://api-staging.andela.com/'
 LOGIN_URL: 'https://api-staging.andela.com/login?redirect_url='
