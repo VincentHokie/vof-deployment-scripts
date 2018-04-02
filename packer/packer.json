@@ -29,6 +29,9 @@
 		},
 		{
 			"type": "shell",
+			"environment_vars": [
+				"RAILS_ENV={{user `env_name`}}"
+			],
 			"script": "setup.sh"
 		},
 		{
