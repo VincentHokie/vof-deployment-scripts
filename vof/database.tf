@@ -36,6 +36,68 @@ resource "google_sql_database_instance" "vof-database-instance" {
   }
 }
 
+resource "google_sql_database_instance" "vof-database-instance-replica" {
+  region = "${var.region}"
+  database_version = "POSTGRES_9_6"
+  name = "${var.env_name}-vof-database-instance-${replace(lower(random_id.db-name.b64), "_", "-")}-replica"
+  project = "${var.project_id}"
+  master_instance_name = "${var.env_name}-vof-database-instance-${replace(lower(random_id.db-name.b64), "_", "-")}"
+  
+  settings {
+    tier = "${var.db_instance_tier}"
+    disk_autoresize = true
+    ip_configuration = {
+      ipv4_enabled = true
+
+      authorized_networks = [{
+        name = "all"
+        value = "0.0.0.0/0"
+      }]
+    }
+
+    backup_configuration {
+      binary_log_enabled = true
+      enabled = true
+      start_time = "${var.db_backup_start_time}"
+    }
+  }
+
+  replica_configuration {
+    failover_target = true
+  }
+}
+
+resource "google_sql_database_instance" "vof-database-instance-replica-2" {
+  region = "${var.region}"
+  database_version = "POSTGRES_9_6"
+  name = "${var.env_name}-vof-database-instance-${replace(lower(random_id.db-name.b64), "_", "-")}-replica-2"
+  project = "${var.project_id}"
+  master_instance_name = "${var.env_name}-vof-database-instance-${replace(lower(random_id.db-name.b64), "_", "-")}-replica"
+  
+  settings {
+    tier = "${var.db_instance_tier}"
+    disk_autoresize = true
+    ip_configuration = {
+      ipv4_enabled = true
+
+      authorized_networks = [{
+        name = "all"
+        value = "0.0.0.0/0"
+      }]
+    }
+
+    backup_configuration {
+      binary_log_enabled = true
+      enabled = true
+      start_time = "${var.db_backup_start_time}"
+    }
+  }
+
+  replica_configuration {
+    failover_target = true
+  }
+}
+
 resource "google_sql_database" "vof-database" {
   name = "${var.env_name}-vof-database"
   instance = "${google_sql_database_instance.vof-database-instance.name}"
