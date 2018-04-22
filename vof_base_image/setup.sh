@@ -3,7 +3,7 @@
 set -e
 set -o pipefail
 
-RUBY_VERSION="${RUBY_VERSION:-2.4.1}"
+RUBY_VERSION="${RUBY_VERSION:-2.4.2}"
 
 create_vof_user() {
   if ! id -u vof; then
@@ -28,6 +28,15 @@ install_ruby(){
     sudo chgrp -R vof  /usr/local
     sudo chmod -R g+rw /usr/local
 
+    curl -k -O -L "https://cache.ruby-lang.org/pub/ruby/${RUBY_VERSION%\.*}/ruby-${RUBY_VERSION}.tar.gz"
+    tar zxf ruby-*
+
+    pushd ruby-$RUBY_VERSION
+      ./configure
+      make && make install
+    popd
+  else
+    # update ruby to 2.4.2
     curl -k -O -L "https://cache.ruby-lang.org/pub/ruby/${RUBY_VERSION%\.*}/ruby-${RUBY_VERSION}.tar.gz"
     tar zxf ruby-*
 
