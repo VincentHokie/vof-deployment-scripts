@@ -37,6 +37,7 @@ install_ruby(){
     popd
   else
     # update ruby to 2.4.2
+    echo "HERE TRYING TO UPDATE"
     curl -k -O -L "https://cache.ruby-lang.org/pub/ruby/${RUBY_VERSION%\.*}/ruby-${RUBY_VERSION}.tar.gz"
     tar zxf ruby-*
 
