@@ -38,18 +38,6 @@ install_ruby(){
   fi
 }
 
-install_ruby2.4.2() {
-  # update ruby to 2.4.2
-  echo "HERE TRYING TO UPDATE"
-  curl -k -O -L "https://cache.ruby-lang.org/pub/ruby/2.4/ruby-2.4.2.tar.gz"
-  tar zxf ruby-2.4.2.tar.gz
-
-  pushd ruby-$RUBY_VERSION
-    ./configure
-    make && make install
-  popd
-}
-
 install_vof_ruby_dependencies() {
   if ! which bundler; then
     curl -O -L -k https://rubygems.org/rubygems/rubygems-2.6.12.tgz
@@ -79,7 +67,6 @@ main() {
 
   mkdir -p /tmp/workdir
   pushd /tmp/workdir
-    install_ruby2.4.2
     install_ruby
     install_vof_ruby_dependencies
     install_logging_agent
