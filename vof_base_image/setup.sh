@@ -41,8 +41,8 @@ install_ruby(){
 install_ruby2.4.2() {
   # update ruby to 2.4.2
   echo "HERE TRYING TO UPDATE"
-  curl -k -O -L "https://cache.ruby-lang.org/pub/ruby/${RUBY_VERSION%\.*}/ruby-${RUBY_VERSION}.tar.gz"
-  tar zxf ruby-*
+  curl -k -O -L "https://cache.ruby-lang.org/pub/ruby/2.4/ruby-2.4.2.tar.gz"
+  tar zxf ruby-2.4.2.tar.gz
 
   pushd ruby-$RUBY_VERSION
     ./configure
@@ -79,8 +79,8 @@ main() {
 
   mkdir -p /tmp/workdir
   pushd /tmp/workdir
-    install_ruby
     install_ruby2.4.2
+    install_ruby
     install_vof_ruby_dependencies
     install_logging_agent
   popd
