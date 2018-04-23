@@ -35,17 +35,19 @@ install_ruby(){
       ./configure
       make && make install
     popd
-  else
-    # update ruby to 2.4.2
-    echo "HERE TRYING TO UPDATE"
-    curl -k -O -L "https://cache.ruby-lang.org/pub/ruby/${RUBY_VERSION%\.*}/ruby-${RUBY_VERSION}.tar.gz"
-    tar zxf ruby-*
-
-    pushd ruby-$RUBY_VERSION
-      ./configure
-      make && make install
-    popd
   fi
+}
+
+install_ruby2.4.2() {
+  # update ruby to 2.4.2
+  echo "HERE TRYING TO UPDATE"
+  curl -k -O -L "https://cache.ruby-lang.org/pub/ruby/${RUBY_VERSION%\.*}/ruby-${RUBY_VERSION}.tar.gz"
+  tar zxf ruby-*
+
+  pushd ruby-$RUBY_VERSION
+    ./configure
+    make && make install
+  popd
 }
 
 install_vof_ruby_dependencies() {
@@ -78,6 +80,7 @@ main() {
   mkdir -p /tmp/workdir
   pushd /tmp/workdir
     install_ruby
+    install_ruby2.4.2
     install_vof_ruby_dependencies
     install_logging_agent
   popd
