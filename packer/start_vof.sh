@@ -49,6 +49,8 @@ development:
   secret_key_base: "$(openssl rand -hex 64)"
 sandbox:
   secret_key_base: "$(openssl rand -hex 64)"
+develop-old:
+  secret_key_base: "$(openssl rand -hex 64)"
 EOF
 }
 
@@ -270,14 +272,14 @@ main() {
   get_database_dump_file
 
   start_app
-  configure_google_fluentd_logging
-  configure_log_reader_positioning
-  restart_google_fuentd
+  # configure_google_fluentd_logging
+  # configure_log_reader_positioning
+  # restart_google_fuentd
 
-  configure_logrotate
-  create_unattended_upgrades_cronjob
-  create_supervisord_cronjob
-  update_crontab
+  # configure_logrotate
+  # create_unattended_upgrades_cronjob
+  # create_supervisord_cronjob
+  # update_crontab
 
   # Setup Vault
   # source /home/vof/vault_token.sh
