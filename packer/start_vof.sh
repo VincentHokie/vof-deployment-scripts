@@ -259,6 +259,26 @@ update_crontab() {
   rm upgrades_cron log_cron supervisord_cron
 }
 
+#Reason: Comment out lines of code that cause supervisor to crash
+escape_slashes() {
+  sed 's/\//\\\//g' 
+}
+
+change_line() {
+  local OLD_LINE_PATTERN=$1; shift
+  local NEW_LINE=$1; shift
+  local FILE=$1
+
+  local NEW=$(echo "${NEW_LINE}" | escape_slashes)
+  sed -i .bak '/'"${OLD_LINE_PATTERN}"'/s/.*/'"${NEW}"'/' "${FILE}"
+  mv "${FILE}.bak" /home/vof/app/db
+}
+
+apply_changes() {
+  change_line "DlcStack.find_or_create_by(program_id: Program.first.id, language_stack_id: LanguageStack.first.id)" "# DlcStack.find_or_create_by(program_id: Program.first.id, language_stack_id: LanguageStack.first.id)" /home/vof/app/db/seeds.rb
+  change_line "DlcStack.find_or_create_by(program_id: Program.first.id, language_stack_id: LanguageStack.second.id)" "# DlcStack.find_or_create_by(program_id: Program.first.id, language_stack_id: LanguageStack.second.id)" /home/vof/app/db/seeds.rb
+}
+
 
 main() {
   echo "startup script invoked at $(date)" >> /tmp/script.log
@@ -271,6 +291,7 @@ main() {
   authenticate_service_account
   get_database_dump_file
 
+  apply_changes
   start_app
   # configure_google_fluentd_logging
   # configure_log_reader_positioning
