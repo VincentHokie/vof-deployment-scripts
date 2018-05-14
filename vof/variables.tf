@@ -24,7 +24,7 @@ variable "project_id" {
 
 variable "machine_type" {
   type = "string"
-  default = "n1-standard-1"
+  default = "n1-standard-2"
 }
 
 variable "small_machine_type" {
