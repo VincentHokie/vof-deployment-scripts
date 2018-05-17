@@ -28,6 +28,7 @@ The code in this repository aim to bring these benefits to the VOF application. 
 - [Logging](docs/logging.md)
 - [DNS](docs/dns.md)
 - [Maintenance](docs/maintenance.md)
+- [Stress Testing](docs/stress_tests.md)
 
 ### Contributors
 
@@ -37,3 +38,4 @@ The code in this repository aim to bring these benefits to the VOF application. 
 - [Businge Scott](https://github.com/scott45)
 - [Nana Elizabeth](https://github.com/natalie-elizabeth)
 - [Aoka Victoria](https://github.com/victoriaaoka)
+- [Vincent Asante](https://github.com/VincentHokie)
