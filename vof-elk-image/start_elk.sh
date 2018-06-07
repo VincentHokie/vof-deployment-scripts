@@ -78,6 +78,24 @@ update_crontab() {
   rm /home/elk/curator/curator_cron.yml
 }
 
+setup_nginx_ssl(){
+
+  gsutil cp gs://${BUCKET_NAME}/ssl/andela_key.key /home/elk/ssl/andela.key
+  gsutil cp gs://${BUCKET_NAME}/ssl/andela_certificate.crt /home/elk/ssl/andela.crt
+
+  sudo sed -i "32a ssl_certificate     /home/elk/ssl/andela.crt;" /etc/nginx/nginx.conf
+  sudo sed -i "33a ssl_certificate_key /home/elk/ssl/andela.key;" /etc/nginx/nginx.conf
+  sudo sed -i "34a ssl_ciphers         EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH;" /etc/nginx/nginx.conf
+  sudo nginx -s reload
+}
+
+configure_auth(){
+
+  echo $(openssl rand -hex 20) | sudo tee -a /home/elk/passwd.txt &> /dev/null
+  echo "kibanaadmin:`openssl passwd -apr1 -in /home/elk/passwd.txt`" | sudo tee -a /etc/nginx/htpasswd.users
+  sudo /etc/init.d/nginx restart
+}
+
 main() {
 
   configure_logstash_ssl
@@ -88,6 +106,9 @@ main() {
 
   create_curator_cronjob
   update_crontab
+
+  setup_nginx_ssl
+  configure_auth
 }
 
 main "$@"

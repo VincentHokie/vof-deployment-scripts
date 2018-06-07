@@ -11,11 +11,6 @@ create_elk_user() {
 }
 
 install_dependancies(){
-    # sudo curl https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz > /tmp/google-cloud-sdk.tar.gz
-    # sudo mkdir -p /usr/local/gcloud
-    # sudo tar -C /usr/local/gcloud -xvf /tmp/google-cloud-sdk.tar.gz
-    # sudo /usr/local/gcloud/google-cloud-sdk/install.sh
-    # export PATH=$PATH:/usr/local/gcloud/google-cloud-sdk/bin
     sudo apt-get update && sudo apt-get install google-cloud-sdk supervisor -y
 }
 
@@ -67,8 +62,19 @@ create_nginx_config(){
     cd ~
     sudo cat <<EOF > ~/elk-nginx
 server {
-    listen 80;
+    listen         80;
+    server_name    vof-kibana.andela.com www.vof-kibana.andela.com;
+    return         301 https://vof-kibana.andela.com$request_uri;
+    return         301 https://www.vof-kibana.andela.com$request_uri;
+}
 
+server {
+    listen              443 ssl default_server;
+    listen              [::]:443 ssl default_server ;
+
+    auth_basic "Restricted Access";
+    auth_basic_user_file /etc/nginx/htpasswd.users;
+    
     location / {
         proxy_pass http://localhost:5601;
         proxy_http_version 1.1;
